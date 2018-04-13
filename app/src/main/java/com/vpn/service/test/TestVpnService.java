@@ -13,14 +13,12 @@ import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class TestVpnService extends VpnService implements Runnable {
 
@@ -204,14 +202,19 @@ public class TestVpnService extends VpnService implements Runnable {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equalsIgnoreCase(action)) {
-                if (hasConnectionChanged(context)) {
-                    Log.d(TAG, "Connection change, restarts the vpn service");
-                    Toast.makeText(context, "Connection change, restarts the vpn service", Toast.LENGTH_SHORT).show();
-                    stopVpn();
-                    startVpn();
+            try {
+                String action = intent.getAction();
+                if (ConnectivityManager.CONNECTIVITY_ACTION.equalsIgnoreCase(action)) {
+                    if (hasConnectionChanged(context)) {
+                        Log.d(TAG, "Connection change, restarts the vpn service");
+                        Toast.makeText(context, "Connection change, restarts the vpn service", Toast.LENGTH_SHORT).show();
+                        stopVpn();
+                        Thread.sleep(20);
+                        startVpn();
+                    }
                 }
+            } catch (InterruptedException e) {
+                Log.w(TAG, "thread interrupted");
             }
         }
 
